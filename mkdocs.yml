@@ -1,4 +1,4 @@
-site_name: My Docs
+site_name: llmada
 
 theme:
   name: "material"
@@ -26,5 +26,3 @@ nav:
   - Index: index.md
   - Tutorial: 
     - filetool: filetool.md
-
-  - Reference: reference.md
