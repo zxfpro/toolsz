@@ -283,3 +283,26 @@ def extract_json_code(text:str)->str:
     matches = re.findall(pattern, text)
     return matches
 
+"""
+## 意像
+
+### 当前时刻
+```python
+current_date = datetime.now()
+
+formatted_date = current_date.strftime("%Y-%m-%d %H:%M:%S")
+formatted_date = current_date.strftime("%Y-%m-%d")
+
+```
+
+### today
+```python
+def get_today():
+	# 获取本地时间
+	local_time = datetime.today()
+	# print("本地时间:", local_time)
+	return local_time
+```
+
+
+"""
