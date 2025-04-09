@@ -1,9 +1,9 @@
 [project]
 name = "tools"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "负责工具"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "setuptools>=78.1.0",
 ]
