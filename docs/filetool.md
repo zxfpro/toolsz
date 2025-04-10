@@ -2,6 +2,6 @@ This path the project documentation focuses on the realize of **TokenCounter** C
 Now it only support the models of OpenAI GPT mode, such as `gpt-3.5-turbo`.
 
 # 1
-::: quickuse.filetool
+::: tools.filetool
 
 
