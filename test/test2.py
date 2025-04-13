@@ -6,14 +6,6 @@ import re
 import pytest
 
 
-
-
-
-qos.os
-qos
-print(123)
-
-
 """
 import unittest
 from unittest.mock import patch
