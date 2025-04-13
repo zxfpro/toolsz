@@ -6,40 +6,33 @@ import requests
 import setproctitle
 
 def setprocesstitle(name:str)->None:
-    """
-    修改线程名
+    """修改线程名
 
-    参数:   
-    name (str): 设定的线程名    
-
-    返回:
-    None
+    Args:
+        name (str): 设定的线程名
     """
     setproctitle.setproctitle(name)
 
 def password(key:str):
-    """
-    动态输入密码
+    """动态输入密码
 
-    参数:   
-    key (str): 提示信息    
+    Args:
+        key (str): 提示信息
 
-    返回:
-    None
+    Returns:
+        getpass: 输入IO交互
     """
     return getpass.getpass(f'{key} input:')
 
-
 def exec_str(code:str,local_vars:dict = None)->dict:
-    """
-    执行代码字符串
+    """执行代码字符串
 
-    参数:   
-    code (str): 代码字符串    
-    local_vars (dict): 变量   
+    Args:
+        code (str): 代码字符串
+        local_vars (dict, optional): 变量输入. Defaults to None.
 
-    返回:
-    dict
+    Returns:
+        dict: 返回修改后的变量赋予
     """
     if local_vars is None:
         local_vars = {}
@@ -58,15 +51,11 @@ class DDMessage:
         self.host = f"https://oapi.dingtalk.com/robot/send?access_token={token}"
 
     def send(self,role: str, content: str)->None:
-        """
-        向钉钉发送文本消息.   
+        """向钉钉发送文本消息
 
-        参数:   
-        role (str): 信号发出者 可以使用Agent System Majordomo    
-        content (str): 消息内容。   
-
-        返回:
-        None
+        Args:
+            role (str): 信号发出者 可以使用Agent System
+            content (str): 消息内容
         """
         assert role in ["Agent", "System", "Majordomo"]
         content = f"{role} : {content}"
@@ -76,18 +65,17 @@ class DDMessage:
             data=json.dumps(data),
             headers={'Content-Type': 'application/json'}, timeout=10)
 
+def send_message_via_dd(role: str, content: str)->None:
+    """通过钉钉机器人发送消息。
 
-def send_message_via_dd(role: str, content: str):
+    Args:
+        role (str): 信号发出者，可以是 "Agent", "System", 或 "Majordomo"。
+        content (str): 要发送的消息内容。
+
+    Raises:
+        ValueError: _description_
     """
-    通过钉钉机器人发送消息。
 
-    参数:   
-    role (str): 信号发出者，可以是 "Agent", "System", 或 "Majordomo"。    
-    content (str): 要发送的消息内容。
-
-    返回:
-    None
-    """
     # 确保环境变量中有钉钉机器人的token
     if not os.environ.get("DD_TOKEN"):
         raise ValueError("Environment variable 'DD_TOKEN' is not set.")
