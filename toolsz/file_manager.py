@@ -1,9 +1,5 @@
-"""
-常用的小工具, 文件工具
+""" 文件工具 """
 
-"""
-
-# LocalFileTool_V2.py
 import os
 import ast
 
@@ -114,7 +110,7 @@ class LocalFileTool:
             self.write_single_file(current_file_path, '\n'.join(current_file_content))
         
         return True
-    
+
     def get_related_files(self, file_path):
         """获取与指定文件相关联的所有项目内文件"""
         all_files = self.get_file_list(include_extensions=['.py'])
@@ -153,156 +149,3 @@ class LocalFileTool:
                 break
 
 
-import setproctitle
-import getpass
-from datetime import datetime
-
-def setprocesstitle(name:str)->None:
-    """
-    修改线程名
-
-    参数:   
-    name (str): 设定的线程名    
-
-    返回:
-    None
-    """
-    setproctitle.setproctitle(name)
-
-def password(key:str):
-    """
-    动态输入密码
-
-    参数:   
-    key (str): 提示信息    
-
-    返回:
-    None
-    """
-    return getpass.getpass(f'{key} input:')
-
-
-def exec_str(code:str,local_vars:dict = {})->dict:
-    """
-    执行代码字符串
-
-    参数:   
-    code (str): 代码字符串    
-    local_vars (dict): 变量   
-
-    返回:
-    dict
-    """
-    exec(code, globals(), local_vars)
-    return local_vars
-
-
-
-import requests
-import json
-import os
-from typing import Callable, List, Dict, Any
-
-class DDMessage:
-    """
-    DingDing_POST类用于向钉钉发送POST请求。
-    """
-    def __init__(self):
-        """
-        初始化DingDing_POST类。
-        """
-        token = os.environ.get("DD_TOKEN")
-        self.host = f"https://oapi.dingtalk.com/robot/send?access_token={token}"
-
-    def send(self,role: str, content: str)->None:
-        """
-        向钉钉发送文本消息.   
-
-        参数:   
-        role (str): 信号发出者 可以使用Agent System Majordomo    
-        content (str): 消息内容。   
-
-        返回:
-        None
-        """
-        assert role in ["Agent", "System", "Majordomo"]
-        
-        content = f"{role} : {content}"
-        data = {"msgtype": "text", "text": {"content": content}}
-        requests.post(self.host, data=json.dumps(data), headers={'Content-Type': 'application/json'})
-
-
-def send_message_via_dd(role: str, content: str):
-    """
-    通过钉钉机器人发送消息。
-
-    参数:   
-    role (str): 信号发出者，可以是 "Agent", "System", 或 "Majordomo"。    
-    content (str): 要发送的消息内容。
-
-    返回:
-    None
-    """
-    # 确保环境变量中有钉钉机器人的token
-    if not os.environ.get("DD_TOKEN"):
-        raise ValueError("Environment variable 'DD_TOKEN' is not set.")
-
-    # 创建DDMessage实例
-    dd_message = DDMessage()
-
-    # 发送消息
-    dd_message.send(role, content)
-
-import re
-
-def extract_python_code(text: str)->str:
-    """
-    从文本中提取python代码
-
-    参数:   
-    text (str): 输入的文本。    
-
-    返回:
-    (str) 提取出的python文本
-    """
-    pattern = r'```python([\s\S]*?)```'
-    matches = re.findall(pattern, text)
-    return matches
-
-def extract_json_code(text:str)->str:
-    """
-    从文本中提取json代码
-
-    参数:   
-    text (str): 输入的文本。    
-
-    返回:
-    (str) 提取出的json文本
-    """
-    pattern = r'```json([\s\S]*?)```'
-    matches = re.findall(pattern, text)
-    return matches
-
-"""
-## 意像
-
-### 当前时刻
-```python
-current_date = datetime.now()
-
-formatted_date = current_date.strftime("%Y-%m-%d %H:%M:%S")
-formatted_date = current_date.strftime("%Y-%m-%d")
-
-```
-
-### today
-```python
-def get_today():
-	# 获取本地时间
-	local_time = datetime.today()
-	# print("本地时间:", local_time)
-	return local_time
-```
-
-
-"""
