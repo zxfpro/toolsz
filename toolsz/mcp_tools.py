@@ -1,5 +1,6 @@
+""" 函数工具 """
 from llama_index.core.tools.types import ToolOutput
-
+from llama_index.core.tools import FunctionTool
 
 def add(a: int, b: int) -> int:
     """Add two numbers."""
@@ -18,16 +19,23 @@ def xshell(shell:str) -> str:
     return tool_output
 
 
-# 创建工具
-from llama_index.core.tools import FunctionTool
+def package(fn,name:str = None,description:str = None):
+    """将一般的函数打包成工具
 
-def package(fn):
-    return FunctionTool.from_defaults(fn=fn)
+    Args:
+        fn (function): 编写的函数
+        name (str, optional): 函数名.
+        description (str, optional): 函数描述. Defaults to None.
 
-def package_update(fn,name = None,description = None):
+    Returns:
+        FunctionTool: functioncall
+    """
 
-    return FunctionTool.from_defaults(fn=fn,
+    if name is not None or description is not None:
+        return FunctionTool.from_defaults(fn=fn,
                                       name = name,
                                       description = description)
+    else:
+        return FunctionTool.from_defaults(fn=fn)
 
 # TODO 增加一些MCP能力
