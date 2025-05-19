@@ -2,6 +2,10 @@
 
 import os
 import ast
+import functools
+import qrcode as qrcode_
+import pickle
+
 
 class LocalFileTool:
     """
@@ -149,206 +153,79 @@ class LocalFileTool:
                 break
 
 
-
-
-
-import re,os,csv,time
-import shutil
-import pandas as pd
-import chardet
-from kafka import KafkaProducer
-from ..basis.toolbasis import BasisTools
-
-
-def running_time(func):
-    """
-    装饰器；
-    用于显示程序执行的时间
-    """
-    def warpper(*args, **mar):
-        start = time.time()
-        result = func(*args, **mar)
-        end = time.time()
-        print(f"执行时间是：{end - start}")
-        return result
-    return warpper
-
-def read_csv(csv_file,type='iter'):
-    """
-    读取csv文件,以不同的方式读取csv
-    :param csv_file:
-    :param type:
-    :return:
-    """
-    assert type in ['iter','dict','DataFrame']
-    if type =='iter':
-        return csv.reader(open(csv_file))
-    elif type=='dict':
-        with open(csv_file,'r') as f:
-            lines = f.readlines()[1:]
-        tokens = [l.rstrip().split(',') for l in lines]
-        return dict(((name, label) for name, label in tokens))
-    elif type =='DataFrame':
-        return pd.read_csv(csv_file)
-
-def copyfile(filename, target_dir):
-    """将文件复制到目标目录。"""
-    os.makedirs(target_dir, exist_ok=True)
-    shutil.copy(filename, target_dir)
-
-class FileTools(BasisTools):
+class PythonLib:
     def __init__(self):
-        """"""
-    def get_encoding_way(self,scv_path):
+        pass
+
+
+    @staticmethod
+    def input_multiline():
+        import sys
+        print("请输入内容（按 Ctrl+D 或 Ctrl+Z 后按回车结束输入）：")
+        multi_line_input = sys.stdin.read()
+        print("你输入的内容是：")
+        print(multi_line_input)
+        return multi_line_input
+
+    @staticmethod
+    def tool_qrcode(img_path: str = './small2.png'):
         """
-        识别csv文件的编码格式
-        :param scv_path:
-        :return:
+        用来将函数输出转化为二维码图片的装饰器
         """
-        f = open(scv_path,'rb')
-        data = f.read()
-        return chardet.detect(data)
-    def get_files(self, path):
-        """
-        输入一个文件夹路径 输出这个文件夹中的文件 忽略文件夹中的文件夹
-        :param path:
-        :return:flie_list
-        """
-        return [os.path.join(path, f) for f in sorted(list(os.listdir(path)))
-                if os.path.isfile(os.path.join(path, f))]
-    def move_file(self,path1,path2):
-        try:
-            shutil.move(path1,path2)
-        except Exception as e:
-            print(e)
-    def path_exist(self,file_path):
-        """
-        判断路径是否存在,不存在则创建,不能跨级创建
-        :param file_path:
-        :return:
-        """
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-        return file_path
-    def get_two_filepath(self,path,tips='csv'):
-        """
-        输入一个路径，输出两个路径
-        :param path:
-        :return:
-        """
-        cl1p = re.sub(f'.{tips}', f'_cl1.{tips}', path)
-        cl2p = re.sub(f'.{tips}', f'_cl2.{tips}', path)
-        return cl1p, cl2p
+
+        def outer_packing(func):
+            @functools.wraps(func)
+            def wrapper(*args, **kwargs):
+                qr = qrcode_.QRCode(version=1, box_size=10, border=5)
+                result = func(*args, **kwargs)
+                qr.add_data(result)
+                qr.make(fit=True)
+                img = qr.make_image(fill_color='black', back_color='white')
+                img.save(img_path)
+                return img
+            return wrapper
+        return outer_packing
+    
+
+""" 函数工具 """
+from llama_index.core.tools.types import ToolOutput
+from llama_index.core.tools import FunctionTool
+
+def add(a: int, b: int) -> int:
+    """Add two numbers."""
+    return a + b
+
+def xshell(shell:str) -> str:
+    "This is an interactive shell tool,It remembers your actions and allows you to take them step by step."
+    print(shell,'shell')
+    result = input('输入shell:')
+    tool_output = ToolOutput(
+        content=result,
+        tool_name="interaction_xshell",
+        raw_input={"args": {"shell":shell}},
+        raw_output={"结果": "成功"}
+    )
+    return tool_output
 
 
-    def safe_save(self,path):
-        """
-        如果原文件存在,创建一个新的文件名,防止把旧文件覆盖掉.
-        :param path:
-        :return:
-        """
-        if os.path.exists(path):
-            path = self.get_new_path(path)
-        return path
-    def get_new_path(self,path):
-        """
-        获得一个新的文件名的路径
-        :param path:
-        :return:
-        """
-        the_parent_directory = '/'.join(path.split('/')[:-1])
-        file_path = path.split('/')[-1]
-        file_list = os.listdir(the_parent_directory)
-        file_list.sort()
-        k = file_list[-1].split('.')[0]
-        number = k.split('_')[-1]
-        try:
-            number = int(number) + 1
-        except Exception:
-            number = 1
-        final_name = file_path.split('.')[-1]
-        file_name = file_path.split('.')[0].split('_')[0]
-        k = f"{file_name}_{number}.{final_name}"
-        k = os.path.join(the_parent_directory,k)
-        return k
+def package(fn,name:str = None,description:str = None):
+    """将一般的函数打包成工具
 
+    Args:
+        fn (function): 编写的函数
+        name (str, optional): 函数名.
+        description (str, optional): 函数描述. Defaults to None.
 
-    def make_some_noise(self):
-        """
-        结束提醒
-        :return:
-        """
-        os.system('spd-say "Now , test finished!"')
+    Returns:
+        FunctionTool: functioncall
+    """
 
+    if name is not None or description is not None:
+        return FunctionTool.from_defaults(fn=fn,
+                                      name = name,
+                                      description = description)
+    else:
+        return FunctionTool.from_defaults(fn=fn)
 
-
-
-
-    def KafKaProduce(self,bootstrap_servers='192.168.1.27:9092'):
-        """
-        kafka的使用
-        :param bootstrap_servers:卡夫卡地址
-        :return:
-        """
-        producer = KafkaProducer(bootstrap_servers=bootstrap_servers)  # 连接kafka
-
-        msg = "Hello World".encode('utf-8')  # 发送内容,必须是bytes类型
-        producer.send('test', msg)  # 发送的topic为test
-        producer.close()
-
-    def write_dict(self,number, value_count):
-        """
-        将一个字典扩增到一定长度，扩增的部分用0补全
-        :param number:9
-        :param value_count: {"12":12,"34":32}
-        :return: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, '12': 12, '34': 32}
-        """
-        number = number + 1
-        dicts = {}
-        for item in range(number):
-            dicts[item] = 0
-        for items, values in value_count.items():
-            dicts[items] = values
-        return dicts
-
-    def get_split_list(self,number,list):
-        """
-        将列表分为固定长度的小列表
-        :param number: 长度
-        :param list: 原列表
-        :return:
-        """
-        columns_list = []
-        group = len(list) // number
-        for item in range(group):
-            columns_list.append(list[number * item:number * (item + 1)])
-        columns_list.append(list[number * group:(number * group) + (len(list) % number)])
-        return columns_list
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# TODO 增加一些MCP能力
 
