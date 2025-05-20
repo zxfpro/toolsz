@@ -135,6 +135,15 @@ wheels = [
 ]
 
 [[package]]
+name = "appscriptz"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/31/51/59c457027588d11d9dd12d72baa877df848fc127c8fea518dc6b28a06c0c/appscriptz-0.1.2.tar.gz", hash = "sha256:dea681042157591286ee7408f9d805fb858ad767e131d35bdfb1b25e5e0cfa94", size = 7571 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/9e/940c87b19c94dac62a9325cf1202e7c06befd0954d590c30d60f01effb93/appscriptz-0.1.2-py3-none-any.whl", hash = "sha256:7e32eca2a8ba3cdf1efb0ac9182d9274a179886fce9b8b96071239a3fadbf33c", size = 8727 },
+]
+
+[[package]]
 name = "async-timeout"
 version = "5.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2040,6 +2049,7 @@ name = "toolsz"
 version = "0.1.6"
 source = { virtual = "." }
 dependencies = [
+    { name = "appscriptz" },
     { name = "beautifulsoup4" },
     { name = "dill" },
     { name = "llama-index" },
@@ -2054,6 +2064,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "appscriptz", specifier = ">=0.1.2" },
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "dill", specifier = ">=0.3.9" },
     { name = "llama-index", specifier = ">=0.12.30" },
